@@ -193,9 +193,9 @@ update msg model =
 
 view : Model -> Html Msg
 view model =
-    layout [ Background.color color.gray245, Font.family [ Font.typeface "Recursive" ] ] <|
+    layout [ Background.gradient { angle = pi, steps = [ color.layoutBg, color.layoutBg, rgb255 255 159 68 ] }, Font.family [ Font.typeface "Recursive" ] ] <|
         column [ width fill, paddingXY 200 20, centerX, inFront (viewErrorMessage model.errorMessage) ]
-            [ column [ width fill, spacing 5 ]
+            [ column [ width fill, spacing 10 ]
                 [ viewHeader
                 , viewUsers model
                 ]
@@ -212,12 +212,13 @@ color =
     , gray245 = rgb255 245 245 245
     , gray250 = rgb255 250 250 250
     , errMsgBg = rgb255 82 185 255
+    , layoutBg = rgb255 102 98 160
     }
 
 
 viewHeader : Element Msg
 viewHeader =
-    el [ centerX, padding 40, Border.rounded 5, Font.center, Font.bold, Font.size 24, Font.letterSpacing 2, Background.color color.white, Border.glow color.gray240 5 ] (text "CRUD App - Elm - Jexia")
+    el [ centerX, padding 40, Border.rounded 5, Font.center, Font.bold, Font.size 28, Font.letterSpacing 2, Background.color color.white, Border.glow color.gray150 2 ] (text "CRUD App - Elm - Jexia")
 
 
 viewBtn : List (Attribute Msg) -> Maybe Msg -> String -> Element Msg
@@ -230,7 +231,7 @@ viewBtn attrs mbMsg txt =
 
 viewUsers : Model -> Element Msg
 viewUsers model =
-    column [ width fill, paddingXY 180 70, spacing 10, Border.rounded 5, Background.color color.white, Border.glow color.gray240 5 ]
+    column [ width fill, paddingXY 180 70, spacing 10, Border.rounded 5, Background.color color.white, Border.glow color.gray150 2 ]
         [ row [ width fill ] [ viewBtn [ width fill, Font.center, padding 20, Border.rounded 5, Border.width 2, Border.dashed, Border.color (rgb255 0 0 0), mouseOver [ Border.color color.gray100, Font.color color.gray100 ] ] (Just AddUser) "Add a new User" ]
         , row [ width fill ]
             [ column [ width fill, spacing 10 ]
