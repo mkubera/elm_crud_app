@@ -11,6 +11,11 @@ dotenv.config()
 const PORT = process.env.ENV == "prod" ? 80 : 3000
 const HOST = process.env.ENV == "prod" ? '0.0.0.0' : '127.0.0.1'
 
+
+/*------------------------
+  👇 JEXIA configuration
+-------------------------*/
+
 const jexiaSDK = require("jexia-sdk-js/node")
 const dataModule = jexiaSDK.dataOperations()
 const field = jexiaSDK.field
@@ -23,6 +28,10 @@ jexiaSDK.jexiaClient().init(credentials, dataModule)
 // Users' dataset
 const users = dataModule.dataset("users") 
 
+
+/*------------------------
+  👇 HANDLERS
+-------------------------*/
 
 // Simple error handler
 const handleError = (err, res) => { 
@@ -37,11 +46,9 @@ const handleOk = (records, action, status, res) => {
 }
 
 
-/* ************
-
-  APP: API 
-
-************ */
+/*------------------------
+  👇 API
+-------------------------*/
 
 // Seed the dataset
 app.get('/api/seed', (req, res) => {
@@ -102,15 +109,15 @@ app.get('/api/users/:id/verify', (req, res) => {
 })
 
 
-/* ************
-
-  APP: HTML
-
-************ */
+/*------------------------
+  👇 HTML file
+-------------------------*/
 
 app.get('*', (req, res) => res.sendFile('index.html'))
 
 
-// SERVER
+/*------------------------
+  👇 SERVER
+-------------------------*/
 app.listen(PORT,HOST)
 log(`App running on http://${HOST}:${PORT}`)

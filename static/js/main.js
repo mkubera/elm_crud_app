@@ -11258,7 +11258,9 @@ var $author$project$Main$update = F2(
 				}
 			case 'AddUser':
 				return _Utils_Tuple2(
-					model,
+					_Utils_update(
+						model,
+						{enteredUsername: ''}),
 					$elm$core$Platform$Cmd$batch(
 						_List_fromArray(
 							[$author$project$Api$Cmds$postNewUser])));

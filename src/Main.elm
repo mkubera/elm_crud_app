@@ -128,7 +128,7 @@ update msg model =
                     ( { model | errorMessage = Just UserVerify }, Cmd.none )
 
         AddUser ->
-            ( model, Cmd.batch [ postNewUser ] )
+            ( { model | enteredUsername = "" }, Cmd.batch [ postNewUser ] )
 
         MakeEditable userId ->
             ( { model
