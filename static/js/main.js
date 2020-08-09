@@ -11003,15 +11003,15 @@ var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
 var $author$project$Main$subs = function (model) {
 	return $elm$core$Platform$Sub$none;
 };
+var $author$project$Model$User = F4(
+	function (id, name, verified, isEditable) {
+		return {id: id, isEditable: isEditable, name: name, verified: verified};
+	});
 var $author$project$Model$UserCreate = {$: 'UserCreate'};
 var $author$project$Model$UserDelete = {$: 'UserDelete'};
 var $author$project$Model$UserUpdate = {$: 'UserUpdate'};
 var $author$project$Model$UserVerify = {$: 'UserVerify'};
 var $author$project$Model$UsersFetch = {$: 'UsersFetch'};
-var $author$project$Model$User = F4(
-	function (id, name, verified, isEditable) {
-		return {id: id, isEditable: isEditable, name: name, verified: verified};
-	});
 var $author$project$Main$dummyUser = A4($author$project$Model$User, '', '', false, false);
 var $elm$core$List$filter = F2(
 	function (isGood, list) {
@@ -11023,6 +11023,10 @@ var $elm$core$List$filter = F2(
 				}),
 			_List_Nil,
 			list);
+	});
+var $author$project$Main$findUserById = F2(
+	function (userId, user) {
+		return _Utils_eq(user.id, userId);
 	});
 var $elm$core$List$head = function (list) {
 	if (list.b) {
@@ -11041,9 +11045,7 @@ var $author$project$Main$chosenUser = F2(
 			$elm$core$List$head(
 				A2(
 					$elm$core$List$filter,
-					function (u) {
-						return _Utils_eq(u.id, userId);
-					},
+					$author$project$Main$findUserById(userId),
 					users)));
 	});
 var $author$project$Msg$GotDeletedUser = function (a) {
@@ -11140,7 +11142,7 @@ var $author$project$Main$update = F2(
 							var id = _v2.id;
 							var name = _v2.name;
 							var verified = _v2.verified;
-							return {id: id, isEditable: false, name: name, verified: verified};
+							return A4($author$project$Model$User, id, name, verified, false);
 						},
 						fetchedUsers);
 					return _Utils_Tuple2(
@@ -11163,7 +11165,7 @@ var $author$project$Main$update = F2(
 					var id = result.a.id;
 					var name = result.a.name;
 					var verified = result.a.verified;
-					var newUser = {id: id, isEditable: true, name: name, verified: verified};
+					var newUser = A4($author$project$Model$User, id, name, verified, true);
 					var newUsers = A2($elm$core$List$cons, newUser, model.users);
 					return _Utils_Tuple2(
 						_Utils_update(
@@ -11359,11 +11361,9 @@ var $author$project$Main$color = {
 	errMsgBg: A3($mdgriffith$elm_ui$Element$rgb255, 82, 185, 255),
 	gray100: A3($mdgriffith$elm_ui$Element$rgb255, 100, 100, 100),
 	gray150: A3($mdgriffith$elm_ui$Element$rgb255, 150, 150, 150),
-	gray200: A3($mdgriffith$elm_ui$Element$rgb255, 200, 200, 200),
-	gray240: A3($mdgriffith$elm_ui$Element$rgb255, 240, 240, 240),
 	gray245: A3($mdgriffith$elm_ui$Element$rgb255, 245, 245, 245),
-	gray250: A3($mdgriffith$elm_ui$Element$rgb255, 250, 250, 250),
-	layoutBg: A3($mdgriffith$elm_ui$Element$rgb255, 102, 98, 160),
+	layoutBg1: A3($mdgriffith$elm_ui$Element$rgb255, 102, 98, 160),
+	layoutBg2: A3($mdgriffith$elm_ui$Element$rgb255, 255, 159, 68),
 	white: A3($mdgriffith$elm_ui$Element$rgb255, 255, 255, 255)
 };
 var $mdgriffith$elm_ui$Internal$Model$Unkeyed = function (a) {
@@ -17396,7 +17396,7 @@ var $author$project$Main$viewErrorMessage = function (mbErrorMessage) {
 									case 'UsersFetch':
 										return 'Failed to fetch Users.';
 									case 'UserCreate':
-										return 'Failed to create new User.';
+										return 'Failed to create a new User.';
 									case 'UserUpdate':
 										return 'Failed to update the User.';
 									case 'UserDelete':
@@ -17435,39 +17435,45 @@ var $mdgriffith$elm_ui$Element$el = F2(
 				_List_fromArray(
 					[child])));
 	});
-var $mdgriffith$elm_ui$Internal$Model$boxShadowClass = function (shadow) {
+var $mdgriffith$elm_ui$Internal$Model$formatTextShadow = function (shadow) {
+	return A2(
+		$elm$core$String$join,
+		' ',
+		_List_fromArray(
+			[
+				$elm$core$String$fromFloat(shadow.offset.a) + 'px',
+				$elm$core$String$fromFloat(shadow.offset.b) + 'px',
+				$elm$core$String$fromFloat(shadow.blur) + 'px',
+				$mdgriffith$elm_ui$Internal$Model$formatColor(shadow.color)
+			]));
+};
+var $mdgriffith$elm_ui$Internal$Model$textShadowClass = function (shadow) {
 	return $elm$core$String$concat(
 		_List_fromArray(
 			[
-				shadow.inset ? 'box-inset' : 'box-',
+				'txt',
 				$mdgriffith$elm_ui$Internal$Model$floatClass(shadow.offset.a) + 'px',
 				$mdgriffith$elm_ui$Internal$Model$floatClass(shadow.offset.b) + 'px',
 				$mdgriffith$elm_ui$Internal$Model$floatClass(shadow.blur) + 'px',
-				$mdgriffith$elm_ui$Internal$Model$floatClass(shadow.size) + 'px',
 				$mdgriffith$elm_ui$Internal$Model$formatColorClass(shadow.color)
 			]));
 };
-var $mdgriffith$elm_ui$Internal$Flag$shadows = $mdgriffith$elm_ui$Internal$Flag$flag(19);
-var $mdgriffith$elm_ui$Element$Border$shadow = function (almostShade) {
-	var shade = {blur: almostShade.blur, color: almostShade.color, inset: false, offset: almostShade.offset, size: almostShade.size};
-	return A2(
-		$mdgriffith$elm_ui$Internal$Model$StyleClass,
-		$mdgriffith$elm_ui$Internal$Flag$shadows,
-		A3(
-			$mdgriffith$elm_ui$Internal$Model$Single,
-			$mdgriffith$elm_ui$Internal$Model$boxShadowClass(shade),
-			'box-shadow',
-			$mdgriffith$elm_ui$Internal$Model$formatBoxShadow(shade)));
-};
-var $mdgriffith$elm_ui$Element$Border$glow = F2(
-	function (clr, size) {
-		return $mdgriffith$elm_ui$Element$Border$shadow(
-			{
-				blur: size * 2,
-				color: clr,
-				offset: _Utils_Tuple2(0, 0),
-				size: size
-			});
+var $mdgriffith$elm_ui$Internal$Flag$txtShadows = $mdgriffith$elm_ui$Internal$Flag$flag(18);
+var $mdgriffith$elm_ui$Element$Font$glow = F2(
+	function (clr, i) {
+		var shade = {
+			blur: i * 2,
+			color: clr,
+			offset: _Utils_Tuple2(0, 0)
+		};
+		return A2(
+			$mdgriffith$elm_ui$Internal$Model$StyleClass,
+			$mdgriffith$elm_ui$Internal$Flag$txtShadows,
+			A3(
+				$mdgriffith$elm_ui$Internal$Model$Single,
+				$mdgriffith$elm_ui$Internal$Model$textShadowClass(shade),
+				'text-shadow',
+				$mdgriffith$elm_ui$Internal$Model$formatTextShadow(shade)));
 	});
 var $mdgriffith$elm_ui$Internal$Flag$letterSpacing = $mdgriffith$elm_ui$Internal$Flag$flag(16);
 var $mdgriffith$elm_ui$Element$Font$letterSpacing = function (offset) {
@@ -17480,17 +17486,6 @@ var $mdgriffith$elm_ui$Element$Font$letterSpacing = function (offset) {
 			'letter-spacing',
 			$elm$core$String$fromFloat(offset) + 'px'));
 };
-var $mdgriffith$elm_ui$Internal$Flag$borderRound = $mdgriffith$elm_ui$Internal$Flag$flag(17);
-var $mdgriffith$elm_ui$Element$Border$rounded = function (radius) {
-	return A2(
-		$mdgriffith$elm_ui$Internal$Model$StyleClass,
-		$mdgriffith$elm_ui$Internal$Flag$borderRound,
-		A3(
-			$mdgriffith$elm_ui$Internal$Model$Single,
-			'br-' + $elm$core$String$fromInt(radius),
-			'border-radius',
-			$elm$core$String$fromInt(radius) + 'px'));
-};
 var $mdgriffith$elm_ui$Element$Font$size = function (i) {
 	return A2(
 		$mdgriffith$elm_ui$Internal$Model$StyleClass,
@@ -17502,14 +17497,13 @@ var $author$project$Main$viewHeader = A2(
 	_List_fromArray(
 		[
 			$mdgriffith$elm_ui$Element$centerX,
-			$mdgriffith$elm_ui$Element$padding(40),
-			$mdgriffith$elm_ui$Element$Border$rounded(5),
+			A2($mdgriffith$elm_ui$Element$paddingXY, 0, 20),
 			$mdgriffith$elm_ui$Element$Font$center,
 			$mdgriffith$elm_ui$Element$Font$bold,
-			$mdgriffith$elm_ui$Element$Font$size(28),
-			$mdgriffith$elm_ui$Element$Font$letterSpacing(2),
-			$mdgriffith$elm_ui$Element$Background$color($author$project$Main$color.white),
-			A2($mdgriffith$elm_ui$Element$Border$glow, $author$project$Main$color.gray150, 2)
+			$mdgriffith$elm_ui$Element$Font$size(32),
+			$mdgriffith$elm_ui$Element$Font$letterSpacing(4),
+			$mdgriffith$elm_ui$Element$Font$color($author$project$Main$color.white),
+			A2($mdgriffith$elm_ui$Element$Font$glow, $author$project$Main$color.gray150, 2)
 		]),
 	$mdgriffith$elm_ui$Element$text('CRUD App - Elm - Jexia'));
 var $author$project$Msg$AddUser = {$: 'AddUser'};
@@ -17565,6 +17559,40 @@ var $mdgriffith$elm_ui$Element$Border$color = function (clr) {
 };
 var $mdgriffith$elm_ui$Internal$Flag$borderStyle = $mdgriffith$elm_ui$Internal$Flag$flag(11);
 var $mdgriffith$elm_ui$Element$Border$dashed = A2($mdgriffith$elm_ui$Internal$Model$Class, $mdgriffith$elm_ui$Internal$Flag$borderStyle, $mdgriffith$elm_ui$Internal$Style$classes.borderDashed);
+var $mdgriffith$elm_ui$Internal$Model$boxShadowClass = function (shadow) {
+	return $elm$core$String$concat(
+		_List_fromArray(
+			[
+				shadow.inset ? 'box-inset' : 'box-',
+				$mdgriffith$elm_ui$Internal$Model$floatClass(shadow.offset.a) + 'px',
+				$mdgriffith$elm_ui$Internal$Model$floatClass(shadow.offset.b) + 'px',
+				$mdgriffith$elm_ui$Internal$Model$floatClass(shadow.blur) + 'px',
+				$mdgriffith$elm_ui$Internal$Model$floatClass(shadow.size) + 'px',
+				$mdgriffith$elm_ui$Internal$Model$formatColorClass(shadow.color)
+			]));
+};
+var $mdgriffith$elm_ui$Internal$Flag$shadows = $mdgriffith$elm_ui$Internal$Flag$flag(19);
+var $mdgriffith$elm_ui$Element$Border$shadow = function (almostShade) {
+	var shade = {blur: almostShade.blur, color: almostShade.color, inset: false, offset: almostShade.offset, size: almostShade.size};
+	return A2(
+		$mdgriffith$elm_ui$Internal$Model$StyleClass,
+		$mdgriffith$elm_ui$Internal$Flag$shadows,
+		A3(
+			$mdgriffith$elm_ui$Internal$Model$Single,
+			$mdgriffith$elm_ui$Internal$Model$boxShadowClass(shade),
+			'box-shadow',
+			$mdgriffith$elm_ui$Internal$Model$formatBoxShadow(shade)));
+};
+var $mdgriffith$elm_ui$Element$Border$glow = F2(
+	function (clr, size) {
+		return $mdgriffith$elm_ui$Element$Border$shadow(
+			{
+				blur: size * 2,
+				color: clr,
+				offset: _Utils_Tuple2(0, 0),
+				size: size
+			});
+	});
 var $mdgriffith$elm_ui$Element$Input$HiddenLabel = function (a) {
 	return {$: 'HiddenLabel', a: a};
 };
@@ -17708,6 +17736,17 @@ var $mdgriffith$elm_ui$Internal$Model$Px = function (a) {
 	return {$: 'Px', a: a};
 };
 var $mdgriffith$elm_ui$Element$px = $mdgriffith$elm_ui$Internal$Model$Px;
+var $mdgriffith$elm_ui$Internal$Flag$borderRound = $mdgriffith$elm_ui$Internal$Flag$flag(17);
+var $mdgriffith$elm_ui$Element$Border$rounded = function (radius) {
+	return A2(
+		$mdgriffith$elm_ui$Internal$Model$StyleClass,
+		$mdgriffith$elm_ui$Internal$Flag$borderRound,
+		A3(
+			$mdgriffith$elm_ui$Internal$Model$Single,
+			'br-' + $elm$core$String$fromInt(radius),
+			'border-radius',
+			$elm$core$String$fromInt(radius) + 'px'));
+};
 var $mdgriffith$elm_ui$Element$Border$solid = A2($mdgriffith$elm_ui$Internal$Model$Class, $mdgriffith$elm_ui$Internal$Flag$borderStyle, $mdgriffith$elm_ui$Internal$Style$classes.borderSolid);
 var $elm$core$List$sortBy = _List_sortBy;
 var $mdgriffith$elm_ui$Element$Input$TextInputNode = function (a) {
@@ -18754,11 +18793,7 @@ var $author$project$Main$view = function (model) {
 				{
 					angle: $elm$core$Basics$pi,
 					steps: _List_fromArray(
-						[
-							$author$project$Main$color.layoutBg,
-							$author$project$Main$color.layoutBg,
-							A3($mdgriffith$elm_ui$Element$rgb255, 255, 159, 68)
-						])
+						[$author$project$Main$color.layoutBg1, $author$project$Main$color.layoutBg1, $author$project$Main$color.layoutBg2])
 				}),
 				$mdgriffith$elm_ui$Element$Font$family(
 				_List_fromArray(

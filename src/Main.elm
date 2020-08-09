@@ -53,7 +53,7 @@ update msg model =
                 Ok fetchedUsers ->
                     let
                         newUsers =
-                            fetchedUsers |> List.map (\{ id, name, verified } -> { id = id, name = name, verified = verified, isEditable = False })
+                            fetchedUsers |> List.map (\{ id, name, verified } -> User id name verified False)
                     in
                     ( { model | users = newUsers }, Cmd.none )
 
@@ -65,7 +65,7 @@ update msg model =
                 Ok { id, name, verified } ->
                     let
                         newUser =
-                            { id = id, name = name, verified = verified, isEditable = True }
+                            User id name verified True
 
                         newUsers =
                             newUser :: model.users
@@ -193,7 +193,7 @@ update msg model =
 
 view : Model -> Html Msg
 view model =
-    layout [ Background.gradient { angle = pi, steps = [ color.layoutBg, color.layoutBg, rgb255 255 159 68 ] }, Font.family [ Font.typeface "Recursive" ] ] <|
+    layout [ Background.gradient { angle = pi, steps = [ color.layoutBg1, color.layoutBg1, color.layoutBg2 ] }, Font.family [ Font.typeface "Recursive" ] ] <|
         column [ width fill, paddingXY 200 20, centerX, inFront (viewErrorMessage model.errorMessage) ]
             [ column [ width fill, spacing 10 ]
                 [ viewHeader
@@ -202,31 +202,14 @@ view model =
             ]
 
 
-color =
-    { white = rgb255 255 255 255
-    , black = rgb255 0 0 0
-    , gray100 = rgb255 100 100 100
-    , gray150 = rgb255 150 150 150
-    , gray200 = rgb255 200 200 200
-    , gray240 = rgb255 240 240 240
-    , gray245 = rgb255 245 245 245
-    , gray250 = rgb255 250 250 250
-    , errMsgBg = rgb255 82 185 255
-    , layoutBg = rgb255 102 98 160
-    }
-
-
 viewHeader : Element Msg
 viewHeader =
-    el [ centerX, padding 40, Border.rounded 5, Font.center, Font.bold, Font.size 28, Font.letterSpacing 2, Background.color color.white, Border.glow color.gray150 2 ] (text "CRUD App - Elm - Jexia")
+    el [ centerX, paddingXY 0 20, Font.center, Font.bold, Font.size 32, Font.letterSpacing 4, Font.color color.white, Font.glow color.gray150 2 ] (text "CRUD App - Elm - Jexia")
 
 
 viewBtn : List (Attribute Msg) -> Maybe Msg -> String -> Element Msg
 viewBtn attrs mbMsg txt =
-    Input.button attrs
-        { onPress = mbMsg
-        , label = text txt
-        }
+    Input.button attrs { onPress = mbMsg, label = text txt }
 
 
 viewUsers : Model -> Element Msg
@@ -242,12 +225,7 @@ viewUsers model =
                             row [ width fill, Font.center, padding 20, spacing 10, Border.rounded 5, Border.width 1, Border.solid, Border.color (rgb255 230 230 230), Background.color color.white, Border.glow color.gray245 5, mouseOver [ Border.color (rgb255 220 220 220) ] ] <|
                                 case u.isEditable of
                                     True ->
-                                        [ Input.text [ centerX, height (px 30), padding 4 ]
-                                            { onChange = StoreEnteredUsername
-                                            , text = model.enteredUsername
-                                            , placeholder = Nothing
-                                            , label = Input.labelHidden "Entered username"
-                                            }
+                                        [ Input.text [ centerX, height (px 30), padding 4 ] { onChange = StoreEnteredUsername, text = model.enteredUsername, placeholder = Nothing, label = Input.labelHidden "Entered username" }
                                         , viewBtn [ centerX, Font.size 14, Border.rounded 5, padding 5, Background.color (rgb255 160 248 180), mouseOver [ alpha 0.8 ] ] (Just (UpdateUser u.id)) "yes"
                                         , viewBtn [ centerX, Font.size 14, Border.rounded 5, padding 5, Background.color (rgb255 240 112 121), mouseOver [ alpha 0.8 ] ] (Just (CloseEdit u.id)) "no"
                                         ]
@@ -280,7 +258,7 @@ viewErrorMessage mbErrorMessage =
                                 "Failed to fetch Users."
 
                             UserCreate ->
-                                "Failed to create new User."
+                                "Failed to create a new User."
 
                             UserUpdate ->
                                 "Failed to update the User."
@@ -299,14 +277,32 @@ viewErrorMessage mbErrorMessage =
 
 
 
---FUNCTIONS
+-- HELPERS
 
 
+color =
+    { white = rgb255 255 255 255
+    , black = rgb255 0 0 0
+    , gray100 = rgb255 100 100 100
+    , gray150 = rgb255 150 150 150
+    , gray245 = rgb255 245 245 245
+    , errMsgBg = rgb255 82 185 255
+    , layoutBg1 = rgb255 102 98 160
+    , layoutBg2 = rgb255 255 159 68
+    }
+
+
+chosenUser : UserId -> Users -> User
 chosenUser userId users =
     users
-        |> List.filter (\u -> u.id == userId)
+        |> List.filter (findUserById userId)
         |> List.head
         |> Maybe.withDefault dummyUser
+
+
+findUserById : UserId -> User -> Bool
+findUserById userId user =
+    user.id == userId
 
 
 
