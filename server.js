@@ -4,7 +4,8 @@ const R = require('ramda')
 const logger = require('morgan')
 const log = console.log
 const dotenv = require("dotenv")
-app.use(logger())
+const morganFormat = process.env.ENV == "prod" ? 'tiny' : 'dev'
+app.use(logger(morganFormat))
 app.use(express.json())
 app.use(express.static('static'))
 dotenv.config()
@@ -113,7 +114,7 @@ app.get('/api/users/:id/verify', (req, res) => {
   👇 HTML file
 -------------------------*/
 
-app.get('*', (req, res) => res.sendFile('index.html'))
+app.get('*', (req, res) => res.sendFile('index.html', {root: `${__dirname}/static`}))
 
 
 /*------------------------
