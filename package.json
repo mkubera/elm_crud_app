@@ -9,7 +9,7 @@
     "daemon": "nodemon server.js",
     "dev": "concurrently \"npm run elm\" \"npm run daemon\"",
     "build": "elm make src/Main.elm --output=static/js/main.js --optimize",
-    "prod": "npm run daemon",
+    "prod": "npm run server.js",
     "start": "npm run prod"
   },
   "author": "",

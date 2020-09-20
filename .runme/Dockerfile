@@ -1,5 +1,5 @@
-FROM node:12.0.0
+FROM node:12.16.2
 WORKDIR /app
 COPY . .
 RUN npm install && npm run build
-ENTRYPOINT npm start
+ENTRYPOINT npm run start
